@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Request Views -->
+    <record id="view_approval_request_tree" model="ir.ui.view">
+        <field name="name">approval.request.tree</field>
+        <field name="model">approval.request</field>
+        <field name="arch" type="xml">
+            <list string="Bandeja de Aprobaciones" decoration-info="state == 'pending'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'">
+                <field name="name"/>
+                <field name="res_model"/>
+                <field name="current_step_id"/>
+                <field name="state" widget="badge" 
+                       decoration-info="state == 'pending'" 
+                       decoration-success="state == 'approved'" 
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_approval_request_form" model="ir.ui.view">
+        <field name="name">approval.request.form</field>
+        <field name="model">approval.request</field>
+        <field name="arch" type="xml">
+            <form string="Solicitud de Aprobación">
+                <header>
+                    <field name="can_review" invisible="1"/>
+                    <button name="action_approve" string="Aprobar" type="object" class="oe_highlight" invisible="not can_review"/>
+                    <button name="action_reject" string="Rechazar" type="object" class="btn-danger" invisible="not can_review"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="rule_id" readonly="1"/>
+                            <field name="current_step_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="res_model" readonly="1"/>
+                            <field name="res_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Historial de Aprobaciones">
+                            <field name="log_ids" readonly="1">
+                                <list>
+                                    <field name="create_date" string="Fecha"/>
+                                    <field name="user_id"/>
+                                    <field name="step_id"/>
+                                    <field name="state"/>
+                                    <field name="comment"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_approval_request" model="ir.actions.act_window">
+        <field name="name">Bandeja de Aprobaciones</field>
+        <field name="res_model">approval.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'pending')]</field>
+    </record>
+
+    <!-- Menus -->
+    <menuitem id="menu_approval_root" name="Approval Engine" sequence="260" web_icon="base_approval_engine,static/description/icon.png"/>
+    
+    <menuitem id="menu_approval_requests" name="Bandeja de Entrada" parent="menu_approval_root" action="action_approval_request" sequence="10"/>
+    
+    <menuitem id="menu_approval_config" name="Configuración" parent="menu_approval_root" sequence="100" groups="group_approval_manager"/>
+    <menuitem id="menu_approval_rule" name="Reglas" parent="menu_approval_config" action="action_approval_rule" sequence="10"/>
+
+</odoo>

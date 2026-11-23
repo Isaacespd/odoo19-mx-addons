@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Rule Views -->
+    <record id="view_approval_rule_tree" model="ir.ui.view">
+        <field name="name">approval.rule.tree</field>
+        <field name="model">approval.rule</field>
+        <field name="arch" type="xml">
+            <list string="Reglas">
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_approval_rule_form" model="ir.ui.view">
+        <field name="name">approval.rule.form</field>
+        <field name="model">approval.rule</field>
+        <field name="arch" type="xml">
+            <form string="Regla de Aprobación">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Ej. Compras mayores a $50,000"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="model_id"/>
+                        </group>
+                        <group>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Condición">
+                            <field name="model_name" invisible="1"/>
+                            <field name="domain" widget="domain" options="{'model': 'model_name'}" style="min-height: 200px;"/>
+                        </page>
+                        <page string="Pasos de Aprobación">
+                            <field name="step_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="group_id"/>
+                                    <field name="user_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_approval_rule" model="ir.actions.act_window">
+        <field name="name">Reglas de Aprobación</field>
+        <field name="res_model">approval.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

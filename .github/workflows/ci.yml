@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    name: pylint-odoo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pylint-odoo
+      - name: Lint
+        run: >
+          pylint --load-plugins=pylint_odoo --disable=all
+          --enable=odoolint,pointless-statement,unused-import,unused-variable,dangerous-default-value,redefined-builtin,undefined-loop-variable,undefined-variable
+          --disable=manifest-required-author
+          --valid-odoo-versions=19.0
+          base_approval_engine sale_margin_approval l10n_mx_partner_validator test_base_approval_engine
+
+  tests:
+    name: Odoo 19 tests
+    runs-on: ubuntu-latest
+    container:
+      image: odoo:19.0
+      options: --user root
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: |
+          odoo --db_host postgres --db_user odoo --db_password odoo \
+            --addons-path=/usr/lib/python3/dist-packages/odoo/addons,"$GITHUB_WORKSPACE" \
+            -d ci -i base_approval_engine,test_base_approval_engine,sale_margin_approval,l10n_mx_partner_validator \
+            --test-tags /base_approval_engine,/test_base_approval_engine,/sale_margin_approval,/l10n_mx_partner_validator \
+            --stop-after-init 2>&1 | tee odoo.log
+      - name: Check results
+        run: |
+          if grep -E '^[0-9-]+ [0-9:,]+ [0-9]+ (ERROR|CRITICAL) ' odoo.log; then
+            echo "::error::Hay errores en el log de Odoo"; exit 1
+          fi
+          grep -E 'odoo.tests.result: 0 failed, 0 error\(s\) of [1-9][0-9]* tests' odoo.log

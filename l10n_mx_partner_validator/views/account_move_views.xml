@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_efos" model="ir.ui.view">
+        <field name="name">account.move.form.efos</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/sheet" position="before">
+                <field name="partner_is_efos" invisible="1"/>
+                <div class="alert alert-danger" role="alert"
+                     invisible="not partner_is_efos or move_type not in ('in_invoice', 'in_refund')">
+                    Este proveedor está como <strong>Definitivo</strong> en el listado 69-B del SAT (EFOS):
+                    sus comprobantes no son deducibles.
+                </div>
+                <div class="alert alert-danger" role="alert"
+                     invisible="not partner_is_efos or move_type not in ('out_invoice', 'out_refund')">
+                    Este cliente está como <strong>Definitivo</strong> en el listado 69-B del SAT (EFOS).
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

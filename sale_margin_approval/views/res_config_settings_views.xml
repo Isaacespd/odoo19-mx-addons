@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sale.margin.approval</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='pricing_setting_container']" position="inside">
+                <setting id="sale_margin_approval_setting" string="Control de Márgenes" help="Aprobación gerencial para ventas con poco margen.">
+                    <field name="min_margin_percentage"/>
+                    <div class="text-muted">
+                        Si el margen de una cotización es inferior a este porcentaje (%), pasará al estado "Esperando Aprobación" y requerirá que un "Aprobador de Márgenes de Venta" la autorice. (0 = Desactivado)
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

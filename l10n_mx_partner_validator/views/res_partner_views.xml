@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_efos" model="ir.ui.view">
+        <field name="name">res.partner.form.efos</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Add a ribbon or badge for EFOS -->
+            <xpath expr="//widget[@name='web_ribbon']" position="after">
+                <widget name="web_ribbon" title="EFOS (69-B)" bg_color="text-bg-danger" invisible="not is_efos"/>
+            </xpath>
+            <xpath expr="//page[@name='internal_notes']" position="after">
+                <page name="efos_validation" string="Validación RFC">
+                    <group>
+                        <field name="is_efos" readonly="1"/>
+                        <field name="l10n_mx_efos_situation"/>
+                        <field name="last_validation_date" readonly="1"/>
+                    </group>
+                    <button name="action_validate_rfc" type="object" string="Validar RFC Ahora" class="btn-primary"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action Server para multiples partners -->
+    <record id="action_validate_rfc_multi" model="ir.actions.server">
+        <field name="name">Validar RFCs (EFOS)</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+                records.action_validate_rfc()
+        </field>
+    </record>
+</odoo>
